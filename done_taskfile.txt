@@ -1,0 +1,2 @@
+/home/sam/Pictures/LDV2_test15/001 /home/sam/Pictures/styles/Viento.jpg /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/001.mp4 60 0.6
+/home/sam/Pictures/LDV2_test15/002 /home/sam/Pictures/styles/Viento.jpg /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/002.mp4 30 0.6

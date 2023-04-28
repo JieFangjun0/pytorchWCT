@@ -1,0 +1,25 @@
+2023-04-27 14:29:40.764 | INFO     | __main__:<module>:69 - progress bar:0/1125
+2023-04-27 14:42:17.398 | ERROR    | __main__:<module>:78 - /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/001.mp4 processed failed!/n
+2023-04-27 19:53:20.142 | INFO     | __main__:<module>:70 - progress bar:0/1125
+2023-04-27 19:53:20.143 | INFO     | __main__:<module>:77 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/001.mp4
+2023-04-27 20:04:22.259 | INFO     | __main__:<module>:82 - /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/001.mp4 processed successfully!
+
+2023-04-27 20:04:22.260 | ERROR    | __main__:<module>:87 - /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/001.mp4 processed failed!
+name 'video' is not defined
+2023-04-27 20:04:22.260 | INFO     | __main__:<module>:77 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/002.mp4
+2023-04-27 20:04:31.761 | ERROR    | __main__:<module>:85 - /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/002.mp4 processed failed!
+
+2023-04-27 20:04:31.762 | INFO     | __main__:<module>:77 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/003.mp4
+2023-04-27 20:21:00.834 | INFO     | __main__:<module>:71 - progress bar:0/1125
+2023-04-27 20:21:00.834 | INFO     | __main__:<module>:79 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/001.mp4
+2023-04-27 20:32:04.340 | INFO     | __main__:<module>:84 - /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/001.mp4 processed successfully!
+
+2023-04-27 20:32:04.341 | INFO     | __main__:<module>:79 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/002.mp4
+2023-04-27 20:37:48.908 | INFO     | __main__:<module>:84 - /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/002.mp4 processed successfully!
+
+2023-04-27 20:37:48.908 | INFO     | __main__:<module>:79 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/003.mp4
+2023-04-27 20:43:32.574 | INFO     | __main__:<module>:84 - /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/003.mp4 processed successfully!
+
+2023-04-27 20:43:32.575 | INFO     | __main__:<module>:79 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/004.mp4
+2023-04-27 22:52:58.628 | INFO     | __main__:<module>:71 - progress bar:2/1125
+2023-04-27 22:52:58.629 | INFO     | __main__:<module>:79 - Start to process /home/sam/Pictures/LDV2_test15_WCT/Viento/alpha0.6/003.mp4
