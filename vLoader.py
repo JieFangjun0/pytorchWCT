@@ -18,7 +18,7 @@ def default_loader(path):
     return Image.open(path).convert('RGB')
 
 class Dataset(data.Dataset):
-    def __init__(self,contentPath,stylePath,fineSize):
+    def __init__(self,contentPath,stylePath,fineSize,device):
         super(Dataset,self).__init__()
         self.contentPath = contentPath
         self.image_list = [x for x in listdir(contentPath) if is_image_file(x)]
@@ -26,6 +26,17 @@ class Dataset(data.Dataset):
         self.stylePath = stylePath
         self.fineSize = fineSize
         self.styleImg = default_loader(self.stylePath)
+        self.se5=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_5_e.pt'),map_location=device)
+        self.sv5=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_5_v.pt'),map_location=device)
+        self.se4=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_4_e.pt'),map_location=device)
+        self.sv4=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_4_v.pt'),map_location=device)
+        self.se3=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_3_e.pt'),map_location=device)
+        self.sv3=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_3_v.pt'),map_location=device)
+        self.se2=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_2_e.pt'),map_location=device)
+        self.sv2=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_2_v.pt'),map_location=device)
+        self.se1=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_1_e.pt'),map_location=device)
+        self.sv1=torch.load(os.path.join('styles_svd',stylePath.split('/')[-1].split('.')[0]+'_1_v.pt'),map_location=device)
+        
         
         self.prep = transforms.Compose([
                     transforms.Resize(fineSize),
@@ -59,7 +70,7 @@ class Dataset(data.Dataset):
         # Preprocess Images
         contentImg = transforms.ToTensor()(contentImg)
         styleImg = transforms.ToTensor()(styleImg)
-        return contentImg.squeeze(0),styleImg.squeeze(0),self.image_list[index]
+        return contentImg.squeeze(0),styleImg.squeeze(0),self.se5,self.sv5,self.se4,self.sv4,self.se3,self.sv3,self.se2,self.sv2,self.se1,self.sv1
 
     def __len__(self):
         # You should change 0 to the total size of your dataset.

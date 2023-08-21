@@ -1,6 +1,8 @@
 import os
 from loguru import logger
 import pandas as pd
+
+import video_WCT as WCT
 #global set
 cuda_index=0
 basePath=os.path.join(os.getenv('HOME'),"Pictures")
@@ -69,17 +71,22 @@ tasks=[t for t in all_tasks if t not in done_tasks]
 done_n=len(done_tasks)
 all_n=len(all_tasks)
 logger.info(f"progress bar:{done_n}/{all_n}")
-# The for loop iterates over each task, and the try-except block is used to handle exceptions.
-# The done_taskfile variable is a file object used to write the processed task.
-for fullOri, fullstyle, fullPro, frame_rate, alpha in tasks:
+
+for ori,style,pro,frame_rate,alpha in tasks:
     try:
+        # create processed dir
+        pro_dir=os.path.dirname(pro)
+        if not os.path.exists(pro_dir):
+            os.makedirs(pro_dir)
         
-        ret = os.system(f"python video_WCT.py  \
-            --contentPath {fullOri} --stylePath {fullstyle}  \
-                --output {fullPro} --alpha {alpha} --fps {frame_rate} --cuda --gpu {cuda_index}")
-        if ret == 0:
-            # Write the processed task to the done_taskfile file.
-            done_taskfile.write(f"{fullOri} {fullstyle} {fullPro} {frame_rate} {alpha}\n")
+        logger.info(f"Start to process {pro}")
+        WCT.main(ori,style,pro,float(alpha),int(frame_rate),cuda=True,gpu=cuda_index)
+        # os.system(f"python video_WCT.py  \
+        #     --contentPath {ori} --stylePath {style}  \
+        #         --output {pro} --alpha {alpha} --fps {frame_rate} --cuda --gpu {cuda_index}")
+        logger.info(f"{pro} processed successfully!\n")
+        done_taskfile=open('done_taskfile.txt','a+')
+        done_taskfile.write(f"{ori} {style} {pro} {frame_rate} {alpha}\n")
+        #logger.error(f"{pro} processed failed!\n")
     except Exception as e:
-        logger.error(e)
-        continue
+        logger.error(f"{pro} processed failed!\n{e}")

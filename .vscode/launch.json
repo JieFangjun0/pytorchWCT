@@ -16,7 +16,7 @@
             "name": "Python: trans",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "./trans.py",
             "console": "integratedTerminal",
             "args": [
             ],

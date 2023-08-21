@@ -24,23 +24,25 @@ class WCT(nn.Module):
         self.d5 = VGG19Decoder5()
         self.d5.load_state_dict(torch.load(args.decoder5))
 
-    def whiten_and_color(self, cF, sF):
+    def whiten_and_color(self, cF, sF,s_e,s_v):
         # assuming input shape is batch_size x c x h x w
         batch_size, cFSize = cF.size(0), cF.size()[1:]
         cF = cF.view(batch_size, cFSize[0], -1)
         c_mean = torch.mean(cF, 2)
         cF = cF - c_mean.unsqueeze(2).expand_as(cF)
         contentConv = torch.bmm(cF, cF.transpose(1, 2)).div(cFSize[1] - 1) + torch.eye(cFSize[0], device=cF.device).double().expand(batch_size, -1, -1)
-        c_u,c_e,c_v=torch.svd(contentConv)
+        
+        c_u,c_e,c_v=torch.linalg.svd(contentConv)
         k_c = torch.sum(c_e > 0.00001, dim=1)
 
-        sFSize = sF.size()[1:]
-        sF = sF.view(batch_size, sFSize[0], -1)
+        
+        # sFSize = sF.size()[1:]
+        # sF = sF.view(batch_size, sFSize[0], -1)
         s_mean = torch.mean(sF, 2)
-        sF = sF - s_mean.unsqueeze(2).expand_as(sF)
-        styleConv = torch.bmm(sF, sF.transpose(1, 2)).div(sFSize[1] - 1)
+        # sF = sF - s_mean.unsqueeze(2).expand_as(sF)
+        # styleConv = torch.bmm(sF, sF.transpose(1, 2)).div(sFSize[1] - 1)
+        # # s_u, s_e, s_v = torch.linalg.svd(styleConv)
         # s_u, s_e, s_v = torch.linalg.svd(styleConv)
-        s_u, s_e, s_v = torch.svd(styleConv)
         k_s = torch.sum(s_e > 0.00001, dim=1)
 
         c_d = (c_e[:, :k_c.max()]).pow(-0.5)
@@ -54,14 +56,14 @@ class WCT(nn.Module):
 
         return targetFeature.view(batch_size, *cFSize)
 
-    def transform(self, cF, sF, alpha):
+    def transform(self, cF, sF, alpha, s_e, s_v):
         # assuming input shape is batch_size x c x h x w
         batch_size, C, W, H = cF.size()
         _, _,W1, H1 = sF.size()
         cF = cF.double().view(batch_size, C, -1)
         sF = sF.double().view(batch_size, C, -1)
 
-        targetFeature = self.whiten_and_color(cF, sF)
+        targetFeature = self.whiten_and_color(cF, sF,s_e,s_v)
         targetFeature = targetFeature.view(batch_size, C, W, H)
         csF = alpha * targetFeature + (1.0 - alpha) * cF.view_as(targetFeature)
         csF = csF.float()
