@@ -30,28 +30,43 @@ class WCT(nn.Module):
         cF = cF.view(batch_size, cFSize[0], -1)
         c_mean = torch.mean(cF, 2)
         cF = cF - c_mean.unsqueeze(2).expand_as(cF)
-        contentConv = torch.bmm(cF, cF.transpose(1, 2)).div(cFSize[1] - 1) + torch.eye(cFSize[0], device=cF.device).double().expand(batch_size, -1, -1)
-        
-        c_u,c_e,c_v=torch.linalg.svd(contentConv)
-        k_c = torch.sum(c_e > 0.00001, dim=1)
+        contentConv = torch.bmm(cF, cF.transpose(1, 2)).div(cFSize[1] - 1) + torch.eye(cFSize[0], device=cF.device).expand(batch_size, -1, -1)
+        contentConv=contentConv
 
         
+        a_diag_ = contentConv.diagonal(dim1=1, dim2=2)
+        a_diag_ += 1e-4 
+
+        c_u,c_e,c_v=torch.linalg.svd(contentConv)
+        c_v=c_v.transpose(-2,-1)
+        # c_u_,c_e,c_v=torch.svd(contentConv,some=False)
+
+        k_c = torch.sum(c_e > 0.00001, dim=1)
+
         # sFSize = sF.size()[1:]
         # sF = sF.view(batch_size, sFSize[0], -1)
-        s_mean = torch.mean(sF, 2)
+        s_mean = torch.mean(sF, 2) #save for later
         # sF = sF - s_mean.unsqueeze(2).expand_as(sF)
         # styleConv = torch.bmm(sF, sF.transpose(1, 2)).div(sFSize[1] - 1)
-        # # s_u, s_e, s_v = torch.linalg.svd(styleConv)
+
+        # a_diag_ = styleConv.diagonal(dim1=1, dim2=2)
+        # a_diag_ += 1e-4 
+
         # s_u, s_e, s_v = torch.linalg.svd(styleConv)
+        # s_v = s_v.transpose(-2,-1)
+        # s_u, s_e, s_v = torch.svd(styleConv,some=False)
+
         k_s = torch.sum(s_e > 0.00001, dim=1)
 
         c_d = (c_e[:, :k_c.max()]).pow(-0.5)
-        step1 = torch.bmm(c_v[:, :, :k_c.max()], c_d.unsqueeze(1) * torch.eye(k_c.max(), device=cF.device).double())
+        step1 = torch.bmm(c_v[:, :, :k_c.max()], c_d.unsqueeze(1) * torch.eye(k_c.max(), device=cF.device))
         step2 = torch.bmm(step1, (c_v[:, :, :k_c.max()].transpose(1, 2)))
+        
         whiten_cF = torch.bmm(step2, cF)
+        
 
         s_d = (s_e[:, :k_s.max()]).pow(0.5)
-        targetFeature = torch.bmm(torch.bmm(torch.bmm(s_v[:, :, :k_s.max()], s_d.unsqueeze(1) * torch.eye(k_s.max() , device=cF.device).double().unsqueeze(0)), (s_v[:, :, :k_s.max()].transpose(1, 2))), whiten_cF)
+        targetFeature = torch.bmm(torch.bmm(torch.bmm(s_v[:, :, :k_s.max()], s_d.unsqueeze(1) * torch.eye(k_s.max() , device=cF.device).unsqueeze(0)), (s_v[:, :, :k_s.max()].transpose(1, 2))), whiten_cF)
         targetFeature = targetFeature + s_mean.unsqueeze(2).expand_as(targetFeature)
 
         return targetFeature.view(batch_size, *cFSize)
@@ -60,13 +75,12 @@ class WCT(nn.Module):
         # assuming input shape is batch_size x c x h x w
         batch_size, C, W, H = cF.size()
         _, _,W1, H1 = sF.size()
-        cF = cF.double().view(batch_size, C, -1)
-        sF = sF.double().view(batch_size, C, -1)
+        cF = cF.view(batch_size, C, -1)
+        sF = sF.view(batch_size, C, -1)
 
         targetFeature = self.whiten_and_color(cF, sF,s_e,s_v)
         targetFeature = targetFeature.view(batch_size, C, W, H)
         csF = alpha * targetFeature + (1.0 - alpha) * cF.view_as(targetFeature)
-        csF = csF.float()
         return csF
 
 

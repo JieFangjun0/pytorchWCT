@@ -9,7 +9,7 @@ import torch.nn as nn
 import os
 
 parser = argparse.ArgumentParser(description='WCT Pytorch')
-parser.add_argument('--contentPath',default='/home/jiefangjun/Pictures/LDV2_test15/003',help='path to train')
+parser.add_argument('--contentPath',default='/home/sam/Pictures/LDV2_test15/003',help='path to train')
 parser.add_argument('--stylePath',default='/home/sam/Pictures/styles/Viento.jpg',help='path to train')
 parser.add_argument('--workers', default=2, type=int, metavar='N',help='number of data loading workers (default: 4)')
 parser.add_argument('--encoder', default='models/vgg19_normalized.pth.tar', help='Path to the VGG conv1_1')
@@ -51,18 +51,23 @@ class WCT(nn.Module):
         sF = sF - s_mean.unsqueeze(2).expand_as(sF)
         styleConv = torch.bmm(sF, sF.transpose(1, 2)).div(sFSize[1] - 1)
         # s_u, s_e, s_v = torch.linalg.svd(styleConv)
-        s_u, s_e, s_v = torch.linalg.svd(styleConv)
-        s_u=s_u[0]
+        a_diag_ = styleConv.diagonal(dim1=1, dim2=2)
+        a_diag_ += 1e-4 
+
+        s_u,s_e,s_v=torch.linalg.svd(styleConv)
+        s_v=s_v.transpose(-2,-1)
+
+        #s_u=s_u[0]
         s_e=s_e[0]
         s_v=s_v[0]
-        torch.save(s_u,os.path.join('styles_svd',file_name+'_u.pt'))
+        #torch.save(s_u,os.path.join('styles_svd',file_name+'_u.pt'))
         torch.save(s_e,os.path.join('styles_svd',file_name+'_e.pt'))
         torch.save(s_v,os.path.join('styles_svd',file_name+'_v.pt'))
         return 
 
     def transform(self, sF,file_name):
         batch_size, C,W1, H1 = sF.size()
-        sF = sF.double().view(batch_size, C, -1)
+        sF = sF.view(batch_size, C, -1)
 
         targetFeature = self.whiten_and_color(sF,file_name)
         
@@ -111,9 +116,9 @@ def main():
             loader = torch.utils.data.DataLoader(dataset=dataset,
                                                 batch_size=args.batch_size,
                                                 shuffle=False)
-            for i,(contentImg,styleImg) in enumerate(loader):
+            for i,(data) in enumerate(loader):
                 if(args.cuda):
-                    styleImg = (styleImg.cuda(args.gpu))
+                    styleImg = (data[1].cuda(args.gpu))
                 styleTransfer(wct,styleImg,style_name)
                 break
 if __name__ == "__main__":
